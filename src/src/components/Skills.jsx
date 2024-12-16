@@ -1,9 +1,15 @@
+import { CircularProgressbar } from "react-circular-progressbar";
+import "react-circular-progressbar/dist/styles.css";
 import { useEffect, useReducer } from 'react';
 import axios from 'axios';
 import { skillReducer, initialState, actionTypes } from '../reducers/skillReducer';
+import { requestStates } from '../constants';
 
 export const Skills = () => {
   const [state, dispatch] = useReducer(skillReducer, initialState);
+  const sortedLanguageList = () => (
+    state.languageList.sort((firstLang, nextLang) =>  nextLang.count - firstLang.count)
+  )
 
   useEffect(() => {
     dispatch({ type: actionTypes.fetch });
@@ -29,6 +35,11 @@ export const Skills = () => {
       }
     });
   };
+
+  const convertCountToPercentage = (count) => {
+    if (count > 10) { return 100; }
+    return count * 10;
+  };
  
   return (
     <div id="skills">
@@ -37,6 +48,26 @@ export const Skills = () => {
           <h2>Skills</h2>
         </div>
         <div className="skills-container">
+        {
+            state.requestState === requestStates.loading && (
+              <p className="description">取得中...</p>
+            )
+          }
+            {
+            state.requestState === requestStates.success && (
+              sortedLanguageList().map((item, index) => (
+                <div className="skill-item" key={index}>
+                  <p className="description"><strong>{item.language}</strong></p>
+                  <CircularProgressbar value={convertCountToPercentage(item.count)} text={`${convertCountToPercentage(item.count)}%`} />
+                </div>
+              ))
+            )
+          }
+                   {
+           state.requestState === requestStates.error && (
+             <p className="description">エラーが発生しました</p>
+           )
+         }
         </div>
       </div>
     </div>
