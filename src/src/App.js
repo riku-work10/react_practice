@@ -25,3 +25,7 @@ function App() {
 }
 
 export default App;
+
+const action = {
+  payload: { languageList: [{count: 1, language: 'Ruby'}, {count: 2, language: 'JavaScript'}] }
+}
